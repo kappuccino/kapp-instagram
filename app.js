@@ -29,7 +29,7 @@ async function image(page, url){
 app.get('/', function(req, res) {
 
 	const username = req.query.username
-	const follower = !!req.query.follower
+	const followers = !!req.query.followers
 
 	const imagesLimit = parseInt(req.query.images, 10)
 
@@ -50,11 +50,12 @@ app.get('/', function(req, res) {
 		const data = {
 			username,
 			url,
+			followers: '',
 			images: []
 		}
 
-		if(follower) {
-			data.follower = await page.evaluate(() => {
+		if(followers) {
+			data.followers = await page.evaluate(() => {
 				const _sharedData = window._sharedData
 				if(!_sharedData) return 0
 
