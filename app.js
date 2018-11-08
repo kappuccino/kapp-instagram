@@ -76,7 +76,7 @@ app.get('/', function(req, res) {
 		}
 
 		if(imagesLimit > 0){
-			let links = await page.$$eval(`a[href$="taken-by=${username}"]`, links => links.map(link => link.href))
+			let links = await page.$$eval(`a[href^="/p/"]`, links => links.map(link => link.href))
 			links = links.slice(0, imagesLimit)
 
 			console.log(`${links.length} links to consider`)
