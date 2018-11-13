@@ -1,12 +1,16 @@
-async function image(page, url, res){
-	console.log(`Working on image: ${url}`)
+async function image(page, index, link, res){
+	console.log(`Working on image ${index}: ${link.url}`)
+
 	awake(res)
 
 	const image = {
-		url
+		thumbnail: link.thumbnail,
+		url: link.url,
+		src: '',
+		caption: ''
 	}
 
-	await page.goto(url, {waitUntil: 'networkidle2'})
+	await page.goto(image.url, {waitUntil: 'networkidle2'})
 
 	try {
 		image.src = await page.$eval(`img[decoding="auto"]`, item => item.src)
@@ -21,7 +25,11 @@ async function image(page, url, res){
 
 async function extract(page, params, res){
 
+	const d = new Date()
+
 	const data = {
+		date: d.toString(),
+		time: d.getTime(),
 		username: params.username,
 		url: params.url,
 		followers: params.followers,
@@ -53,14 +61,25 @@ async function extract(page, params, res){
 	}
 
 	if(data.imagesLimit > 0){
-		let links = await page.$$eval(`a[href^="/p/"]`, links => links.map(link => link.href))
+
+		let links = await page.$$eval(`a[href^="/p/"]`, links => {
+			return links.map(link => {
+				const img = link.querySelector('img')
+				const thb = img ? img.getAttribute('src') : null
+				return {url: link.href, thumbnail: thb}
+			})
+		})
+
 		links = links.slice(0, data.imagesLimit)
 
 		console.log(`${links.length} links to consider`)
 
+
+		let index = 0;
 		for await(let link of links){
-			const img = await image(page, link, res)
+			const img = await image(page, index, link, res)
 			data.images.push(img)
+			index++;
 		}
 	}
 
