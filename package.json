@@ -1,6 +1,6 @@
 {
   "name": "kapp-instagram",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "cette mini app utilise Puppeter pour récupérer des infos sur un compte instagram",
   "main": "app.js",
   "scripts": {
