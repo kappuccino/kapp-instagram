@@ -75,11 +75,11 @@ async function extract(page, params, res){
 		console.log(`${links.length} links to consider`)
 
 
-		let index = 0;
+		let index = 0
 		for await(let link of links){
 			const img = await image(page, index, link, res)
 			data.images.push(img)
-			index++;
+			index++
 		}
 	}
 
