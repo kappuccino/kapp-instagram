@@ -21,7 +21,7 @@ app.get('/', async (req, res) => {
 	console.log(`Opening ${url}`, 'Params', req.query)
 
 	const browser = await puppeteer.launch({
-		headless: false,
+		headless: process.env.NODE_ENV === 'production',
 		args: ['--no-sandbox', '--disable-setuid-sandbox']
 	})
 
