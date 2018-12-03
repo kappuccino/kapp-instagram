@@ -23,6 +23,10 @@ async function image(page, index, link, res){
 	return image
 }
 
+function wait (ms) {
+	return new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+
 async function extract(page, params, res){
 
 	const d = new Date()
@@ -38,6 +42,15 @@ async function extract(page, params, res){
 	}
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
+
+	if(data.imagesLimit > 18) {
+		for (let i = 0; i < Math.round(data.imagesLimit / 18); i++) {
+			await page.evaluate(async () => {
+				window.scrollBy(0, 3500)
+			})
+			await wait(500)
+		}
+	}
 
 	if(data.followers) {
 		data.followers = await page.evaluate(() => {
@@ -62,12 +75,6 @@ async function extract(page, params, res){
 
 	if(data.imagesLimit > 0){
 
-		if(data.imagesLimit > 18){
-			await page.evaluate(_ => {
-				window.scrollBy(0, window.innerHeight);
-			});
-		}
-
 		let links = await page.$$eval(`a[href^="/p/"]`, links => {
 			return links.map(link => {
 				const img = link.querySelector('img')
@@ -79,7 +86,6 @@ async function extract(page, params, res){
 		links = links.slice(0, data.imagesLimit)
 
 		console.log(`${links.length} links to consider`)
-
 
 		let index = 0
 		for await(let link of links){
