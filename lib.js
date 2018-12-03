@@ -62,6 +62,12 @@ async function extract(page, params, res){
 
 	if(data.imagesLimit > 0){
 
+		if(data.imagesLimit > 18){
+			await page.evaluate(_ => {
+				window.scrollBy(0, window.innerHeight);
+			});
+		}
+
 		let links = await page.$$eval(`a[href^="/p/"]`, links => {
 			return links.map(link => {
 				const img = link.querySelector('img')
