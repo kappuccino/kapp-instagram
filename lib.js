@@ -44,7 +44,11 @@ async function extract(page, params, res){
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 
 	if(data.imagesLimit > 18) {
-		for (let i = 0; i < Math.round(data.imagesLimit / 18); i++) {
+		const iteration = Math.round(data.imagesLimit / 18)
+		console.log('We need to scroll', iteration, 'times');
+
+		for (let i = 0; i < iteration; i++) {
+			awake(res)
 			await page.evaluate(async () => {
 				window.scrollBy(0, 3500)
 			})
