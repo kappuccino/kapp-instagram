@@ -84,6 +84,9 @@ async function extract(page, params, res){
 	if(data.imagesLimit > 0){
 		console.log('Want', data.imagesLimit, 'images')
 
+		let linksTotal = await page.$$eval(`a[href^="/p/"]`, links => links.length)
+		console.log('Links Total', linksTotal)
+
 		let links = await page.$$eval(`a[href^="/p/"]`, links => {
 			return links.map(link => {
 				const img = link.querySelector('img')

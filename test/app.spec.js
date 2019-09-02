@@ -25,3 +25,6 @@ describe('App', () => {
 	}, 15000)
 
 })
+
+// Buildpack
+// https://buildpack-registry.s3.amazonaws.com/buildpacks/jontewks/puppeteer.tgz
