@@ -11,7 +11,7 @@ async function image(page, index, link, username, res){
 	}
 
 	await page.goto(image.url, {waitUntil: 'networkidle2'})
-	await page.screenshot({path: `screenshot/${username}-${index}.png`})
+	await page.screenshot({path: `screenshot-${username}-${index}.png`})
 
 	try {
 		image.src = await page.$eval(`img[decoding="auto"]`, item => item.src)
@@ -45,7 +45,7 @@ async function extract(page, params, res){
 	console.log('Opening', data.url)
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
-	await page.screenshot({path: `screenshot/${data.username}.png`})
+	await page.screenshot({path: `screenshot-${data.username}.png`})
 
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)
@@ -93,7 +93,6 @@ async function extract(page, params, res){
 		})
 
 		links = links.slice(0, data.imagesLimit)
-
 		console.log(`${links.length} links to consider`)
 
 		let index = 0

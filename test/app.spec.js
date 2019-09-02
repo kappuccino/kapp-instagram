@@ -14,7 +14,7 @@ describe('App', () => {
 		await page.setViewport({width: 1280, height: 1280})
 
 		const res = await extract(page, {
-			username: 'kappuccinoweb',
+			username: 'teenfr',
 			imagesLimit: 1
 		})
 

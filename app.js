@@ -8,7 +8,7 @@ const app = express()
 const port = process.env.PORT || 8080
 
 // --
-app.use(express.static('screenshot'))
+//app.use(express.static(''))
 
 app.get('/', async (req, res) => {
 
