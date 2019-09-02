@@ -1,4 +1,4 @@
-async function image(page, index, link, res){
+async function image(page, index, link, username, res){
 	console.log(`Working on image ${index}: ${link.url}`)
 
 	awake(res)
@@ -11,6 +11,7 @@ async function image(page, index, link, res){
 	}
 
 	await page.goto(image.url, {waitUntil: 'networkidle2'})
+	await page.screenshot({path: `screenshot/${username}-${index}.png`})
 
 	try {
 		image.src = await page.$eval(`img[decoding="auto"]`, item => item.src)
@@ -42,7 +43,9 @@ async function extract(page, params, res){
 	}
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
-	await wait(1000)
+	await page.screenshot({path: `screenshot/${data.username}.png`})
+
+//await wait(1000)
 
 	/*console.log('--source--')
 	const bodyHTML = await page.evaluate(() => document.body.innerHTML);
@@ -101,7 +104,7 @@ async function extract(page, params, res){
 
 		let index = 0
 		for await(let link of links){
-			const img = await image(page, index, link, res)
+			const img = await image(page, index, link, data.username, res)
 			data.images.push(img)
 			index++
 		}

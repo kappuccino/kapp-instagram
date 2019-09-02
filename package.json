@@ -9,7 +9,7 @@
     "debug": "nodemon --inspect ./"
   },
   "engines": {
-    "node": "10.4.1",
+    "node": "10.15.3",
     "npm": "6.4.1"
   },
   "keywords": [],
@@ -17,8 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "puppeteer": "^1.19.0",
-    "request": "^2.88.0"
+    "puppeteer": "^1.19.0"
   },
   "devDependencies": {
     "jest": "^24.9.0"
