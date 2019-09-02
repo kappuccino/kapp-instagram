@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const {extract} = require('../lib')
 
-describe('App', async () => {
+describe('App', () => {
 
 	it('Should return one image', async () => {
 
@@ -14,7 +14,7 @@ describe('App', async () => {
 		await page.setViewport({width: 1280, height: 1280})
 
 		const res = await extract(page, {
-			url: 'https://www.instagram.com/kappuccinoweb/',
+			username: 'kappuccinoweb',
 			imagesLimit: 1
 		})
 

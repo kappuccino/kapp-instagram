@@ -36,16 +36,16 @@ async function extract(page, params, res){
 		date: d.toString(),
 		time: d.getTime(),
 		username: params.username,
-		url: params.url,
-		followers: params.followers,
-		imagesLimit: params.imagesLimit,
+		url: `https://www.instagram.com/${params.username}/`,
+		followers: params.followers || false,
+		imagesLimit: params.imagesLimit || 0,
 		images: []
 	}
 
+	console.log('Opening', data.url)
+
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 	await page.screenshot({path: `screenshot/${data.username}.png`})
-
-	return data
 
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)

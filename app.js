@@ -18,8 +18,7 @@ app.get('/', async (req, res) => {
 	const followers = !!req.query.followers
 	const imagesLimit = parseInt(req.query.images, 10)
 
-	const url = `https://www.instagram.com/${username}/`
-	console.log(`Opening ${url}`, 'Params', req.query)
+	console.log(`Opening`, 'Params', req.query)
 
 	const browser = await puppeteer.launch({
 		headless: process.env.NODE_ENV === 'production',
@@ -29,7 +28,7 @@ app.get('/', async (req, res) => {
 	const page = await browser.newPage()
 	await page.setViewport({width: 1280, height: 1280})
 
-	const data = await extract(page, {username, url, followers, imagesLimit}, res)
+	const data = await extract(page, {username, followers, imagesLimit}, res)
 
 	// Pas possible d'utiliser res.json() —à cause du reswrite(' ')
 	res.write(JSON.stringify(data))
