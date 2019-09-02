@@ -43,6 +43,12 @@ async function extract(page, params, res){
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 
+	console.log('--source--')
+	const bodyHTML = await page.evaluate(() => document.body.innerHTML)
+	console.log(bodyHTML)
+	console.log('--source--')
+
+
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)
 		console.log('We need to scroll', iteration, 'times');
@@ -78,9 +84,9 @@ async function extract(page, params, res){
 	}
 
 	if(data.imagesLimit > 0){
+		console.log('Want', data.imagesLimit, 'images')
 
 		let links = await page.$$eval(`a[href^="/p/"]`, links => {
-			console.log(links)
 			return links.map(link => {
 				const img = link.querySelector('img')
 				const thb = img ? img.getAttribute('src') : null
