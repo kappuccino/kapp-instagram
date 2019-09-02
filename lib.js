@@ -45,13 +45,7 @@ async function extract(page, params, res){
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 	await page.screenshot({path: `screenshot/${data.username}.png`})
 
-//await wait(1000)
-
-	/*console.log('--source--')
-	const bodyHTML = await page.evaluate(() => document.body.innerHTML);
-	console.log()
-	console.log('--source--')
-*/
+	return data
 
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)
