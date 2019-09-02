@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "jest"
+    "test": "jest",
+    "debug": "nodemon --inspect ./"
   },
   "engines": {
     "node": "10.4.1",
