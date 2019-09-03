@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 // Based on https://timleland.com/headless-chrome-on-heroku/
 
 const puppeteer = require('puppeteer')
@@ -5,7 +7,7 @@ const express = require('express')
 const {extract} = require('./lib')
 
 const app = express()
-const port = process.env.PORT || 8080
+const port = process.env.PORT
 
 // --
 //app.use(express.static(''))
