@@ -5,10 +5,7 @@ async function screenshot(page, fileName){
 	const {promisify} = require('util')
 	const unlink = promisify(fs.unlink)
 
-	if(!process.env.UPLOAD_AWS){
-		console.log(`Uplaoad screenshot ${fileName} to AWS disabled`)
-		return
-	}
+	if(!process.env.UPLOAD_AWS) return
 
 	await page.screenshot({path: fileName})
 	await save(fileName, fileName)
@@ -55,15 +52,6 @@ async function isLoggedIn(page){
 	})
 }
 
-async function isLoginPage(page){
-
-	return page.evaluate(() => {
-		return !!document.querySelector('input[name="username"]')
-	})
-
-}
-
-
 async function login(page){
 
 	const already = await isLoggedIn(page)
@@ -77,7 +65,7 @@ async function login(page){
 	return new Promise(async (resolve, reject) => {
 		await page.goto('https://www.instagram.com/accounts/login/', {waitUntil: 'networkidle2'})
 
-		const timeout = setTimeout(() => {
+		/*const timeout = setTimeout(() => {
 			const err = new Error('Login failed timeout')
 			reject(err)
 		}, 5000)
@@ -93,7 +81,7 @@ async function login(page){
 
 				return res.authenticated ? resolve(true) : resolve(false)
 			})
-		})
+		})*/
 
 		await page.focus('input[name="username"]')
 		await page.keyboard.type(process.env.IG_LOGIN)
@@ -103,6 +91,10 @@ async function login(page){
 
 		const submit = await page.$('button[type=submit]')
 		await submit.click()
+
+		await wait(3000)
+
+		resolve()
 	})
 
 }
@@ -123,22 +115,23 @@ async function extract(page, params, res){
 
 	console.log('Opening', data.url)
 
-	/*// Log in first
-	await login(page)
-	console.log('Next')*/
-
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 	await screenshot(page, `${data.username}-home.png`)
 
-	console.log( page.url())
 	const url = await page.url()
-	console.log({url})
-	const loginPage = url.includes('/accounts/login/')
+	console.log('Current URL of the page', url, 'Should be', data.url)
 
-	console.log('Login page ?', {loginPage})
+	const loginPage = url.includes('/accounts/login/')
+	console.log('Is the current URL the login page ?', loginPage)
+
 	if(loginPage){
+		console.log('Redirection vers le login')
+		await login(page)
+		console.log('Return to the good page we want to')
 		await page.goto(data.url, {waitUntil: 'networkidle2'})
-		await screenshot(page, `${data.username}-home2.png`)
+
+		let url = await page.url()
+		console.log('Current URL of the page (after login)', url)
 	}
 
 	if(data.imagesLimit > 18) {
