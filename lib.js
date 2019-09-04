@@ -55,6 +55,15 @@ async function isLoggedIn(page){
 	})
 }
 
+async function isLoginPage(page){
+
+	return page.evaluate(() => {
+		return !!document.querySelector('input[name="username"]')
+	})
+
+}
+
+
 async function login(page){
 
 	const already = await isLoggedIn(page)
@@ -114,13 +123,23 @@ async function extract(page, params, res){
 
 	console.log('Opening', data.url)
 
-	// Log in first
+	/*// Log in first
 	await login(page)
-
-	console.log('Next')
+	console.log('Next')*/
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 	await screenshot(page, `${data.username}-home.png`)
+
+	console.log( page.url())
+	const url = await page.url()
+	console.log({url})
+	const loginPage = url.includes('/accounts/login/')
+
+	console.log('Login page ?', {loginPage})
+	if(loginPage){
+		await page.goto(data.url, {waitUntil: 'networkidle2'})
+		await screenshot(page, `${data.username}-home2.png`)
+	}
 
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)
