@@ -4,13 +4,12 @@ require('dotenv').config()
 
 const puppeteer = require('puppeteer')
 const express = require('express')
-const {extract} = require('./lib')
+const {login, extract} = require('./lib')
 
 const app = express()
 const port = process.env.PORT
 
 // --
-//app.use(express.static(''))
 
 app.get('/', async (req, res) => {
 

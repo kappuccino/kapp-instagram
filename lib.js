@@ -5,6 +5,11 @@ async function screenshot(page, fileName){
 	const {promisify} = require('util')
 	const unlink = promisify(fs.unlink)
 
+	if(!process.env.UPLOAD_AWS){
+		console.log(`Uplaoad screenshot ${fileName} to AWS disabled`)
+		return
+	}
+
 	await page.screenshot({path: fileName})
 	await save(fileName, fileName)
 	await unlink(fileName)
@@ -40,6 +45,59 @@ function wait (ms) {
 	return new Promise(resolve => setTimeout(() => resolve(), ms));
 }
 
+async function isLoggedIn(page){
+	return page.evaluate(() => {
+		const _sharedData = window._sharedData
+		if(!_sharedData) return false
+
+		const config = _sharedData.config
+		return config && config.viewer && config.viewer.id
+	})
+}
+
+async function login(page){
+
+	const already = await isLoggedIn(page)
+	if(already){
+		console.log('Already logged in')
+		return false
+	}
+
+	console.log('Logging in Instagram')
+
+	return new Promise(async (resolve, reject) => {
+		await page.goto('https://www.instagram.com/accounts/login/', {waitUntil: 'networkidle2'})
+
+		const timeout = setTimeout(() => {
+			const err = new Error('Login failed timeout')
+			reject(err)
+		}, 5000)
+
+		page.on('response', response => {
+			if(response._url !== 'https://www.instagram.com/accounts/login/ajax/') return
+
+			response.text().then(async textBody => {
+				const res = JSON.parse(textBody)
+
+				clearTimeout(timeout)
+				await wait(500)
+
+				return res.authenticated ? resolve(true) : resolve(false)
+			})
+		})
+
+		await page.focus('input[name="username"]')
+		await page.keyboard.type(process.env.IG_LOGIN)
+
+		await page.focus('input[name="password"]')
+		await page.keyboard.type(process.env.IG_PASS)
+
+		const submit = await page.$('button[type=submit]')
+		await submit.click()
+	})
+
+}
+
 async function extract(page, params, res){
 
 	const d = new Date()
@@ -55,6 +113,11 @@ async function extract(page, params, res){
 	}
 
 	console.log('Opening', data.url)
+
+	// Log in first
+	await login(page)
+
+	console.log('Next')
 
 	await page.goto(data.url, {waitUntil: 'networkidle2'})
 	await screenshot(page, `${data.username}.png`)
@@ -131,5 +194,7 @@ function awake(res){
 }
 
 module.exports = {
+	login,
+	isLoggedIn,
 	extract
 }

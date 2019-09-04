@@ -1,9 +1,27 @@
 require('dotenv').config()
 
 const puppeteer = require('puppeteer')
-const {extract} = require('../lib')
+const {extract, login, isLoggedIn} = require('../lib')
 
 describe('App', () => {
+
+	it('Should login', async () => {
+
+		const browser = await puppeteer.launch({
+			headless: false,
+			args: ['--no-sandbox', '--disable-setuid-sandbox']
+		})
+
+		const page = await browser.newPage()
+		await page.setViewport({width: 1280, height: 1280})
+
+		await login(page)
+		const is = await isLoggedIn(page)
+		await browser.close()
+
+		expect(is).toBeTruthy()
+
+	}, 15000)
 
 	it('Should return one image', async () => {
 
