@@ -13,7 +13,7 @@ async function screenshot(page, fileName){
 }
 
 async function image(page, index, link, username, res){
-	console.log(`Working on image ${index}: ${link.url}`)
+	console.log(username, `Working on image ${index}: ${link.url}`)
 
 	awake(res)
 
@@ -38,10 +38,6 @@ async function image(page, index, link, username, res){
 	return image
 }
 
-function wait (ms) {
-	return new Promise(resolve => setTimeout(() => resolve(), ms));
-}
-
 async function isLoggedIn(page){
 	return page.evaluate(() => {
 		const _sharedData = window._sharedData
@@ -52,36 +48,18 @@ async function isLoggedIn(page){
 	})
 }
 
-async function login(page){
+async function login(page, username){
 
 	const already = await isLoggedIn(page)
 	if(already){
-		console.log('Already logged in')
+		console.log(username, 'Already logged in')
 		return false
 	}
 
-	console.log('Logging in Instagram')
+	console.log(username, 'Logging in Instagram')
 
 	return new Promise(async (resolve, reject) => {
-		await page.goto('https://www.instagram.com/accounts/login/', {waitUntil: 'networkidle2'})
-
-		/*const timeout = setTimeout(() => {
-			const err = new Error('Login failed timeout')
-			reject(err)
-		}, 5000)
-
-		page.on('response', response => {
-			if(response._url !== 'https://www.instagram.com/accounts/login/ajax/') return
-
-			response.text().then(async textBody => {
-				const res = JSON.parse(textBody)
-
-				clearTimeout(timeout)
-				await wait(500)
-
-				return res.authenticated ? resolve(true) : resolve(false)
-			})
-		})*/
+		await page.goto(`https://www.instagram.com/accounts/login/?next=%2F${username}%2F&source=desktop_nav`, {waitUntil: 'networkidle2'})
 
 		await page.focus('input[name="username"]')
 		await page.keyboard.type(process.env.IG_LOGIN)
@@ -91,8 +69,6 @@ async function login(page){
 
 		const submit = await page.$('button[type=submit]')
 		await submit.click()
-
-		await wait(3000)
 
 		resolve()
 	})
@@ -113,30 +89,31 @@ async function extract(page, params, res){
 		images: []
 	}
 
-	console.log('Opening', data.url)
+	//await login(page, params.username)
 
-	await page.goto(data.url, {waitUntil: 'networkidle2'})
-	await screenshot(page, `${data.username}-home.png`)
-
-	const url = await page.url()
-	console.log('Current URL of the page', url, 'Should be', data.url)
-
-	const loginPage = url.includes('/accounts/login/')
-	console.log('Is the current URL the login page ?', loginPage)
-
-	if(loginPage){
+	/*if(loginPage){
 		console.log('Redirection vers le login')
-		await login(page)
 		console.log('Return to the good page we want to')
 		await page.goto(data.url, {waitUntil: 'networkidle2'})
 
 		let url = await page.url()
 		console.log('Current URL of the page (after login)', url)
-	}
+	}*/
+
+	console.log(data.username, 'Opening', data.url)
+
+	await page.goto(data.url, {waitUntil: 'networkidle2'})
+	await screenshot(page, `${data.username}-home.png`)
+
+	const url = await page.url()
+	console.log(data.username, 'Current URL of the page', url, 'Should be', data.url)
+
+	/*const loginPage = url.includes('/accounts/login/')
+	console.log('Is the current URL the login page ?', loginPage)*/
 
 	if(data.imagesLimit > 18) {
 		const iteration = Math.round(data.imagesLimit / 18)
-		console.log('We need to scroll', iteration, 'times');
+		console.log(data.username, 'We need to scroll', iteration, 'times');
 
 		for (let i = 0; i < iteration; i++) {
 			awake(res)
@@ -169,10 +146,10 @@ async function extract(page, params, res){
 	}
 
 	if(data.imagesLimit > 0){
-		console.log('Want', data.imagesLimit, 'images')
+		console.log(data.username, 'Want', data.imagesLimit, 'images')
 
 		let linksTotal = await page.$$eval(`a[href^="/p/"]`, links => links.length)
-		console.log('Links Total', linksTotal)
+		console.log(data.username, 'Links Total', linksTotal)
 
 		let links = await page.$$eval(`a[href^="/p/"]`, links => {
 			return links.map(link => {
@@ -183,7 +160,7 @@ async function extract(page, params, res){
 		})
 
 		links = links.slice(0, data.imagesLimit)
-		console.log(`${links.length} links to consider`)
+		console.log(data.username, `${links.length} links to consider`)
 
 		let index = 0
 		for await(let link of links){
@@ -196,6 +173,12 @@ async function extract(page, params, res){
 	return data
 }
 
+//
+
+function wait (ms) {
+	return new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+
 function awake(res){
 	if(!res) return
 
@@ -204,6 +187,8 @@ function awake(res){
 	if(res) res.write(' ') // empty space
 
 }
+
+//
 
 module.exports = {
 	login,
